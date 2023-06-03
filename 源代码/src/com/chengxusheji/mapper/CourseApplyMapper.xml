@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CourseApplyMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加课程申请记录 -->
+	<insert id="addCourseApply" parameterType="courseApply">
+		insert into t_courseApply(courseObj,userObj,applyTime,shenHeState,shenHeResult,shenHeTime) values 
+		(#{courseObj.courseNo},#{userObj.user_name},#{applyTime},#{shenHeState},#{shenHeResult},#{shenHeTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询课程申请记录 -->
+	<select id="queryCourseApply" resultMap="courseApplyMap" >
+		select t_courseApply.* from t_courseApply,t_course,t_userInfo ${where} and t_courseApply.courseObj = t_course.courseNo and t_courseApply.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="courseApplyMap" type="courseApply">
+        <id property="applyId" column="applyId" />
+        <association property="courseObj" column="courseObj" select="com.chengxusheji.mapper.CourseMapper.getCourse" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有课程申请记录 -->
+	<select id="queryCourseApplyList" resultMap="courseApplyMap" >
+		select t_courseApply.* from t_courseApply,t_course,t_userInfo ${where} and t_courseApply.courseObj = t_course.courseNo and t_courseApply.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的课程申请记录数 -->
+	<select id="queryCourseApplyCount" resultType="int">
+		select count(*) from t_courseApply,t_course,t_userInfo ${where} and t_courseApply.courseObj = t_course.courseNo and t_courseApply.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个课程申请记录 -->
+	<select id="getCourseApply" parameterType="int" resultMap="courseApplyMap">
+		select * from t_courseApply where t_courseApply.applyId = #{applyId}
+	</select>
+
+	<!-- 更新课程申请记录 -->
+	<update id="updateCourseApply" parameterType="courseApply">
+		update t_courseApply set courseObj=#{courseObj.courseNo},userObj=#{userObj.user_name},applyTime=#{applyTime},shenHeState=#{shenHeState},shenHeResult=#{shenHeResult},shenHeTime=#{shenHeTime} where applyId = #{applyId}
+	</update>
+
+	<!-- 删除课程申请记录 -->
+	<delete id="deleteCourseApply" parameterType="int">
+		delete from t_courseApply where applyId=#{applyId}
+	</delete>
+
+</mapper>
